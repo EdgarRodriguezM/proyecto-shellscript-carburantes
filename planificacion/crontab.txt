@@ -1,0 +1,1 @@
+0 11 * * * /home/edgar/upv/proyecto_shellscript.sh >> /home/edgar/upv/log.txt 2>&1

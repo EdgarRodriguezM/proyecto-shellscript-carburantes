@@ -1,0 +1,9 @@
+# Datos generados automáticamente
+datasets/*.json
+
+# Logs
+log.txt
+
+# Archivos temporales
+*.tmp
+*.bak
