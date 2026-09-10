@@ -5,13 +5,13 @@
 # Shell en entornos Linux - UPV
 # ============================================================
 # Ejecutar manualmente:
-#   ./script_analisis_json.sh
+#   ./proyecto_shellscript.sh
 #
 # Para probar con un JSON local sin descargar de Internet:
-#   JSON_PRUEBA=/ruta/descarga.json ./script_analisis_json.sh
+#   JSON_PRUEBA=/ruta/descarga.json ./proyecto_shellscript.sh
 #
-# Cron propuesto (02:00 todos los días):
-#   0 2 * * * /ruta/completa/proyecto_gasolineras_shell/script_analisis_json.sh >> /ruta/completa/proyecto_gasolineras_shell/log.txt 2>&1
+# Cron propuesto (11:00 todos los días):
+#   0 11 * * * /home/edgar/upv/proyecto_shellscript.sh >> /home/edgar/upv/log.txt 2>&1
 # ============================================================
 
 set -u
@@ -243,6 +243,58 @@ GASOLEO_VALENCIA_MAX=$(echo "$GASOLEO_VALENCIA" | cut -d'|' -f2)
 GASOLEO_VALENCIA_AVG=$(echo "$GASOLEO_VALENCIA" | cut -d'|' -f3)
 
 TOTAL_VALENCIA=$(jq '[.ListaEESSPrecio[] | select(.Provincia == "VALENCIA / VALÈNCIA")] | length' "$ARCHIVO_SALIDA")
+
+
+# ------------------------------------------------------------
+# 4. HISTÓRICO COMPACTO DE PRECIOS
+# ------------------------------------------------------------
+# Se conserva un registro diario por estación.
+# Los JSON completos de datasets/ siguen eliminándose después de 7 días.
+
+CARPETA_HISTORICO="$CARPETA_BASE/historico"
+ARCHIVO_HISTORICO="$CARPETA_HISTORICO/precios_historicos.csv"
+
+mkdir -p "$CARPETA_HISTORICO"
+
+# Crear el archivo con encabezados si todavía no existe.
+if [ ! -f "$ARCHIVO_HISTORICO" ]; then
+    echo "fecha,IDEESS,provincia,municipio,rotulo,gasolina95,gasolina98,gasoleoA,latitud,longitud" > "$ARCHIVO_HISTORICO"
+fi
+
+# Generar la captura actual en un archivo temporal.
+TMP_HISTORICO="${ARCHIVO_HISTORICO}.tmp"
+
+jq -r --arg fecha "$FECHA_DIA" '
+    .ListaEESSPrecio[]
+    | [
+        $fecha,
+        .IDEESS,
+        .Provincia,
+        .Municipio,
+        .["Rótulo"],
+        .["Precio Gasolina 95 E5"],
+        .["Precio Gasolina 98 E5"],
+        .["Precio Gasoleo A"],
+        .Latitud,
+        .["Longitud (WGS84)"]
+      ]
+    | @csv
+' "$ARCHIVO_SALIDA" > "$TMP_HISTORICO"
+
+# Añadir la captura actual al histórico.
+tail -n +2 "$TMP_HISTORICO" >> "$ARCHIVO_HISTORICO"
+
+# Evitar duplicados: una estación solo aparece una vez por fecha.
+{
+    head -n 1 "$ARCHIVO_HISTORICO"
+    tail -n +2 "$ARCHIVO_HISTORICO" | awk -F',' '!seen[$1 FS $2]++'
+} > "${ARCHIVO_HISTORICO}.nuevo"
+
+mv "${ARCHIVO_HISTORICO}.nuevo" "$ARCHIVO_HISTORICO"
+rm -f "$TMP_HISTORICO"
+
+log "Histórico actualizado: $ARCHIVO_HISTORICO"
+
 
 # Informacion de la estacion donde aparece cada minimo y maximo.
 G95_GLOBAL_MIN_INFO="$(estacion_extrema 'Precio Gasolina 95 E5' 'min')"
