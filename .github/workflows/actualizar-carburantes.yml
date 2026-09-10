@@ -1,0 +1,33 @@
+name: Actualizar precios de carburantes
+
+on:
+  workflow_dispatch:
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar dependencias
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+      - name: Ejecutar script
+        run: |
+          chmod +x proyecto_shellscript.sh
+          ./proyecto_shellscript.sh
+
+      - name: Guardar cambios
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add historico/ informes/
+          git diff --cached --quiet || git commit -m "Actualizar datos de carburantes"
+          git push
