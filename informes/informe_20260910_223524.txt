@@ -1,0 +1,44 @@
+============================================================
+INFORME DIARIO DE PRECIOS DE CARBURANTES
+============================================================
+Fecha de datos: 2026-09-10
+Fecha de ejecución: 2026-09-10 22:35:24
+Dataset: precios_gasolineras_20260910_223524.json
+
+RESUMEN DEL DATASET
+------------------------------------------------------------
+Total de estaciones: 11495
+
+GASOLINA 95 E5 (DATASET COMPLETO)
+Precios válidos: 10933
+Mínimo:          1.309 €/L
+Máximo:          2.299 €/L
+Promedio:        1.851 €/L
+
+GASOLINA 95 E5 (VALENCIA)
+Mínimo:          1.587 €/L
+Máximo:          2.079 €/L
+Promedio:        1.833 €/L
+
+GASOLINA 98 E5
+Precios válidos: 5505
+Mínimo:          1.387 €/L
+Máximo:          2.379 €/L
+Promedio:        2.012 €/L
+
+GASÓLEO A
+Precios válidos: 11280
+Mínimo:          1.437 €/L
+Máximo:          2.249 €/L
+Promedio:        1.821 €/L
+
+TOP 5 GASOLINERAS MÁS BARATAS DE VALENCIA
+(Gasolina 95 E5)
+------------------------------------------------------------
+1. 1.587 €/L - BALLENOIL | Alzira | CALLE PROYECTO, 14
+2. 1.587 €/L - FAMILY ENERGY | Carcaixent | AVENIDA BOTICARI BODI (C.C. RIBERA DEL XUQUER), 28
+3. 1.587 €/L - BALLENOIL | Carcaixent | CALLE VICTOR OROVAL I TOMAS, 7
+4. 1.597 €/L - PLENERGY | Alcúdia (l') | AVENIDA ANTONIO ALMELA, 1
+5. 1.597 €/L - PLENERGY | Alcúdia (l') | AVENIDA MONTORTAL, S/N
+
+============================================================
