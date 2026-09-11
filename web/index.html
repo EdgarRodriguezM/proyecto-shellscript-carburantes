@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gasolineras España | Precios de carburantes</title>
+    <meta name="description" content="Consulta y compara los precios de las gasolineras en España por provincia, municipio y carburante.">
+
+    <link rel="stylesheet" href="styles.css">
+
+    <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a class="brand" href="#" aria-label="Gasolineras España">
+            <span class="brand-mark">⛽</span>
+            <span>
+                <strong>Gasolineras España</strong>
+                <small>Compara. Ahorra. Decide mejor.</small>
+            </span>
+        </a>
+
+        <div class="header-status">
+            <span class="status-dot"></span>
+            <span id="header-status-text">Cargando datos...</span>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-copy">
+                <span class="eyebrow">COMPARADOR DE PRECIOS</span>
+                <h1>Encuentra gasolina al <span>mejor precio.</span></h1>
+                <p>Busca gasolineras por provincia o municipio y compara sus precios en segundos.</p>
+            </div>
+
+            <section class="search-card" aria-label="Buscar gasolineras">
+                <div class="search-card-head">
+                    <div>
+                        <span class="search-kicker">BUSCAR GASOLINERAS</span>
+                        <h2>¿Dónde quieres buscar?</h2>
+                    </div>
+                    <span class="search-icon">⌕</span>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="provincia">Provincia</label>
+                        <select id="provincia">
+                            <option value="">Selecciona una provincia</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="municipio">Municipio <span class="optional">opcional</span></label>
+                        <select id="municipio" disabled>
+                            <option value="">Todos los municipios</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="combustible">Carburante</label>
+                        <select id="combustible">
+                            <option value="gasolina95">Gasolina 95</option>
+                            <option value="gasolina98">Gasolina 98</option>
+                            <option value="gasoleoA">Gasóleo A</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="buscar" class="primary-button">
+                    <span>🔎</span> Buscar precios
+                </button>
+
+                <p class="search-help">Los resultados se ordenan por precio automáticamente.</p>
+            </section>
+        </div>
+    </section>
+
+    <div class="page-content">
+        <div id="estado" class="loading-box">Cargando datos de carburantes...</div>
+
+        <section id="resultados-section" class="search-results hidden">
+            <div class="section-topline">
+                <div>
+                    <span class="eyebrow">RESULTADOS</span>
+                    <h2 id="titulo-resultados">Gasolineras</h2>
+                    <p id="contador-resultados"></p>
+                </div>
+
+                <div class="sort-box">
+                    <label for="orden">Ordenar por</label>
+                    <select id="orden">
+                        <option value="asc">Precio más bajo</option>
+                        <option value="desc">Precio más alto</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <article class="stat-card stat-cheapest">
+                    <span class="stat-icon">↓</span>
+                    <div><small>PRECIO MÍNIMO</small><strong id="precio-minimo">—</strong></div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-icon">≈</span>
+                    <div><small>PRECIO MEDIO</small><strong id="precio-medio">—</strong></div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-icon">↑</span>
+                    <div><small>PRECIO MÁXIMO</small><strong id="precio-maximo">—</strong></div>
+                </article>
+            </div>
+
+            <div class="results-layout">
+                <div class="results-panel">
+                    <div class="panel-heading">
+                        <h3>Estaciones encontradas</h3>
+                        <span id="resultados-count-badge"></span>
+                    </div>
+                    <div id="lista-resultados" class="results-list"></div>
+                </div>
+
+                <aside id="map-section" class="map-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Mapa</h3>
+                            <span>Haz clic en una estación para ver sus datos.</span>
+                        </div>
+                    </div>
+                    <div id="map"></div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="history-section" class="history-section hidden">
+            <div class="section-topline history-topline">
+                <div>
+                    <span class="eyebrow">HISTÓRICO DE PRECIOS</span>
+                    <h2>Evolución de una estación</h2>
+                    <p>Compara cómo ha cambiado el precio con las actualizaciones que vamos acumulando.</p>
+                </div>
+
+                <div class="history-selector">
+                    <label for="historial-estacion">Estación</label>
+                    <select id="historial-estacion"></select>
+                </div>
+            </div>
+
+            <div class="history-station-head">
+                <div>
+                    <h3 id="historial-nombre">Selecciona una estación</h3>
+                    <p id="historial-ubicacion"></p>
+                </div>
+                <div class="history-current">
+                    <small>PRECIO ACTUAL</small>
+                    <strong id="historial-actual">—</strong>
+                </div>
+            </div>
+
+            <div class="history-stats">
+                <div class="history-stat">
+                    <span>Días registrados</span>
+                    <strong id="historial-dias">—</strong>
+                </div>
+                <div class="history-stat">
+                    <span>Mínimo registrado</span>
+                    <strong id="historial-min">—</strong>
+                </div>
+                <div class="history-stat">
+                    <span>Máximo registrado</span>
+                    <strong id="historial-max">—</strong>
+                </div>
+                <div class="history-stat">
+                    <span>Variación</span>
+                    <strong id="historial-variacion">—</strong>
+                </div>
+            </div>
+
+            <div class="chart-wrap">
+                <canvas id="history-chart"></canvas>
+                <div id="history-empty" class="history-empty hidden"></div>
+            </div>
+
+            <p class="history-note">
+                El histórico crece automáticamente con cada ejecución diaria del Shell Script. Con una sola fecha verás el punto inicial; a medida que se acumulen días aparecerá la evolución.
+            </p>
+        </section>
+
+        <section class="national-section">
+            <div class="section-topline national-head">
+                <div>
+                    <span class="eyebrow">PANORAMA NACIONAL</span>
+                    <h2>Los precios más bajos de España</h2>
+                    <p>Las estaciones más económicas de la última actualización disponible.</p>
+                </div>
+
+                <div class="national-filter">
+                    <label for="combustible-espana">Carburante</label>
+                    <select id="combustible-espana">
+                        <option value="gasolina95">Gasolina 95</option>
+                        <option value="gasolina98">Gasolina 98</option>
+                        <option value="gasoleoA">Gasóleo A</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="top-espana" class="national-list"></div>
+        </section>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div>
+            <strong>Gasolineras España</strong>
+            <p>Proyecto Shell Script · UPV</p>
+        </div>
+        <div class="footer-right">
+            <p>Datos de precios de carburantes del Ministerio para la Transición Ecológica y el Reto Demográfico.</p>
+            <p id="footer-update"></p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
