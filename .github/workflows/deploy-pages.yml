@@ -1,0 +1,57 @@
+name: Publicar web en GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+  workflow_run:
+    workflows:
+      - Actualizar precios de carburantes
+    types:
+      - completed
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v6
+
+      - name: Preparar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Preparar archivos de la web
+        run: |
+          mkdir -p site/historico
+
+          cp web/index.html site/
+          cp web/styles.css site/
+          cp web/app.js site/
+
+          cp historico/precios_historicos.csv site/historico/
+
+      - name: Subir archivos de la web
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: './site'
+
+      - name: Publicar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
