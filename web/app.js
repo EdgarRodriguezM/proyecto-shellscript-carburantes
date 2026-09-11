@@ -1,4 +1,6 @@
-const ARCHIVO_DATOS = "../historico/precios_historicos.csv";
+const ARCHIVO_DATOS = window.location.hostname.includes("github.io")
+    ? "./historico/precios_historicos.csv"
+    : "../historico/precios_historicos.csv";const ARCHIVO_DATOS = "../historico/precios_historicos.csv";
 
 let datosHistoricos = [];
 let estaciones = [];
